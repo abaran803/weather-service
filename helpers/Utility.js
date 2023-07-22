@@ -30,6 +30,7 @@ const setWeatherInterval = (millisecond) => {
 };
 
 const updateWeatherInterval = (millisecond) => {
+  console.log(millisecond);
   setWeatherInterval(millisecond);
 };
 
