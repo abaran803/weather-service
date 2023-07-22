@@ -1,4 +1,6 @@
 const Redis = require("ioredis");
+const fetch = (...args) => import('node-fetch')
+                .then(({default: fetch}) => fetch(...args));
 
 const mongoose = require("mongoose");
 const { UserModel } = require("../models/UserModel");
