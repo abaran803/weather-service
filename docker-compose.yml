@@ -4,19 +4,32 @@ services:
     build: .
     container_name: my-node-app
     ports:
-      - "8080:8080"
+      - "8080:3001"
     depends_on:
       - redis
       - mongodb
-
-  redis:
-    image: redis:latest
-    container_name: my-redis
-    ports:
-      - "6379:6379"
 
   mongodb:
     image: mongo
     container_name: my-mongodb
     ports:
       - "27017:27017"
+
+  redis:
+    image: redis:6.0.7
+    restart: always
+    volumes:
+      - redis_volume_data:/data
+    ports:
+      - 6379:6379
+  redis_insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis_insight
+    restart: always
+    ports:
+      - 8001:8001
+    volumes:
+      - redis_insight_volume_data:/db
+volumes:
+  redis_volume_data:
+  redis_insight_volume_data:

@@ -1,6 +1,7 @@
 const { AvailableCities } = require("../models/CityModel");
 const { HistoryModel } = require("../models/HistoryModel");
 const { UserModel } = require("../models/UserModel");
+const { subscribeWeather } = require("../services/RedisService");
 
 module.exports.subscribeCity = async (req, res) => {
   const { email, city } = req.body;
@@ -12,12 +13,17 @@ module.exports.subscribeCity = async (req, res) => {
       await user.save();
     }
     // Check if city exists
-    const checkCityStatus = await AvailableCities.findOne({ cityName: city });
-    if (!checkCityStatus) {
+    const checkCityStatus = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&mode=json&units=metric&appid=${process.env.API_KEY}`);
+    if (checkCityStatus.cod == '404') {
       throw new Error("City not found, please enter valid city");
     }
+    let cityData = await AvailableCities.findOne({ cityName: city });
+    if(!cityData) {
+      const newCity = AvailableCities({cityName: city, active: 1});
+      cityData = await newCity.save();
+    }
+    const cityId = cityData._id;
     // Check if already subscribed
-    const cityId = checkCityStatus._id;
     const checkSubscribedStatus = await UserModel.findOne({
       email,
       subscribedCitiesId: {
