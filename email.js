@@ -20,13 +20,17 @@ transporter.verify(function (error, success) {
 });
 
 const email = (receiver, data) => {
-  const generatedMailBody = `
+  const generatedMailBody = data.type === 'simple' ? `
     <table>
       <tr>
         <th>${data.city}: </th>
         <td>${data.temperature} k</td>
       </tr>
     </table>
+  ` : `
+    <div style="color: red;">
+      Important alert from openweather, the weather condition of ${data.city} is ${data.condition}
+    </div>
   `;
 
   return {

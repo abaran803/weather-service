@@ -41,6 +41,19 @@ Weather Alert System where users can subscribe to weather updates for specific c
 | `minute`      | `string` | minutes for update Interval |
 | `hour`      | `string` | hours for update interval |
 
+#### Activate Alert
+
+```http
+  POST /activate/alert
+```
+
+| Body | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `email` | `string` | **Required**. Your Email |
+| `type` | `string` | **Required**. Enter alert type(description) |
+
+Note: You can get the entire list of alert type description here: https://openweathermap.org/weather-conditions
+
 
 ## Run Locally
 
@@ -140,6 +153,9 @@ To stop and remove the running services, use the following command:
 
     3. After that interval, check the history of that account by using /history/{email} GET API.
     Note: It is possible to subscribe more than one city by an account, just call the API /subscribe again with same email and different city
+
+    4. You can activate the alert for different weather conditions by using API /activate/alert. After activating alert, you will get an email with red coloured body content everytime when during weather fetch, the weather condition is same.
+    Note: You can get the entire list of alert type description here: https://openweathermap.org/weather-conditions
 
 
 ## API service

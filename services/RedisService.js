@@ -32,13 +32,16 @@ module.exports.subscribeWeather = async (city, email) => {
         cityName: channelCity,
       });
       const cityId = selectedCity._id.toString();
-      const temperature = message.temperature;
+      const {condition, temperature} = message
       await HistoryModel.create({
         userId,
         cityId: new mongoose.Types.ObjectId(cityId),
         temperature,
       });
-      mailer(email, {city, temperature});
+      if(user.alertTypes && user.alertTypes.find(item => item == condition)) {
+        mailer(email, {city, condition, type: 'important'});
+      }
+      mailer(email, {city, temperature, type: 'simple'});
     }
   });
 };
@@ -50,9 +53,11 @@ module.exports.publishWeather = async (cityName) => {
     );
     const data = await response.json();
     const temperature = data.main.temp;
+    const condition = data.weather[0].main;
 
     const message = {
       temperature,
+      condition,
       cityName,
     };
 

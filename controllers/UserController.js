@@ -95,3 +95,32 @@ module.exports.checkHistory = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
+module.exports.activateAlert = async (req, res) => {
+  try {
+    const type = req.body.type;
+    const email = req.body.email;
+    const userData = await UserModel.findOne({email});
+    if(!userData) {
+      throw new Error("User not found!!");
+    }
+    if(userData.alertTypes.find(item => item == type)) {
+      throw new Error("Already Activated!!");
+    }
+    if(userData.alertTypes) {
+      await UserModel.findOneAndUpdate(
+        { email },
+        { $push: { alertTypes: type } }
+      );
+    } else {
+      const alert = UserModel.findOneAndUpdate(
+        { email },
+        { alertTypes: [type] }
+      );
+      await alert.save();
+    }
+    res.status(200).json({message: "Alert added, but if the alert type is incorrect, you will never get any update"});
+  } catch(err) {
+    res.status(400).json({message: err.message});
+  }
+}
