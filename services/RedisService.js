@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const { UserModel } = require("../models/UserModel");
 const { AvailableCities } = require("../models/CityModel");
 const { HistoryModel } = require("../models/HistoryModel");
+const mailer = require("../email");
 
 const publisher = new Redis({
   host: process.env.REDIS_HOST,
@@ -37,6 +38,7 @@ module.exports.subscribeWeather = async (city, email) => {
         cityId: new mongoose.Types.ObjectId(cityId),
         temperature,
       });
+      mailer(email, {city, temperature});
     }
   });
 };

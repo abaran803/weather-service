@@ -13,13 +13,15 @@ module.exports.subscribeCity = async (req, res) => {
       await user.save();
     }
     // Check if city exists
-    const checkCityStatus = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&mode=json&units=metric&appid=${process.env.API_KEY}`);
-    if (checkCityStatus.cod == '404') {
+    const checkCityStatus = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&mode=json&units=metric&appid=${process.env.API_KEY}`
+    );
+    if (checkCityStatus.status == "404" || checkCityStatus.cod == '404') {
       throw new Error("City not found, please enter valid city");
     }
     let cityData = await AvailableCities.findOne({ cityName: city });
-    if(!cityData) {
-      const newCity = AvailableCities({cityName: city, active: 1});
+    if (!cityData) {
+      const newCity = AvailableCities({ cityName: city, active: 1 });
       cityData = await newCity.save();
     }
     const cityId = cityData._id;
@@ -55,8 +57,19 @@ module.exports.checkHistory = async (req, res) => {
     if (!checkUserExist) {
       throw new Error("User not found!!");
     }
+    // Get the current date and time
+    const currentDate = new Date();
+    // Calculate the date and time 24 hours ago from the current date
+    const twentyFourHoursAgo = new Date(
+      currentDate.getTime() - 24 * 60 * 60 * 1000
+    );
     const history = await HistoryModel.aggregate([
-      { $match: { userId: checkUserExist._id.toString() } },
+      {
+        $match: {
+          userId: checkUserExist._id.toString(),
+          createdAt: { $gte: twentyFourHoursAgo },
+        },
+      },
       {
         $lookup: {
           from: "cities",
