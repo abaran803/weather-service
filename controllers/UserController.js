@@ -2,6 +2,8 @@ const { AvailableCities } = require("../models/CityModel");
 const { HistoryModel } = require("../models/HistoryModel");
 const { UserModel } = require("../models/UserModel");
 const { subscribeWeather } = require("../services/RedisService");
+const fetch = (...args) => import('node-fetch')
+                .then(({default: fetch}) => fetch(...args));
 
 module.exports.subscribeCity = async (req, res) => {
   const { email, city } = req.body;
